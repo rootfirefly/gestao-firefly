@@ -15,13 +15,13 @@ export function MaskedInput({
   ...props 
 }: MaskedInputProps) {
   return (
-    <div className="space-y-1">
-      <label className="block text-sm font-medium text-gray-700">
+    <div className="space-y-2">
+      <label className="block text-base font-medium text-gray-700">
         {label}
       </label>
       <div className="relative">
         {icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             {icon}
           </div>
         )}
@@ -31,7 +31,8 @@ export function MaskedInput({
           className={`
             block w-full rounded-md border-gray-300 shadow-sm
             focus:border-blue-500 focus:ring-blue-500
-            ${icon ? 'pl-10' : 'pl-4'}
+            text-base py-3
+            ${icon ? 'pl-12' : 'pl-4'}
             ${className}
           `}
         />

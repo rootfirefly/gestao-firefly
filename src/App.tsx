@@ -7,8 +7,19 @@ import DashboardVendedor from './pages/DashboardVendedor';
 import DashboardAdmin from './pages/DashboardAdmin';
 import DashboardSuperAdmin from './pages/DashboardSuperAdmin';
 import { RotaProtegida } from './components/RotaProtegida';
+import { useAuthLoading } from './hooks/useAuthLoading';
 
 function App() {
+  const loading = useAuthLoading();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f6f8fa] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2da44e]"></div>
+      </div>
+    );
+  }
+
   return (
     <BrowserRouter>
       <Toaster position="top-right" />

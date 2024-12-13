@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Mail, Phone, UserPlus, Power, Building2 } from 'lucide-react';
 import { Usuario } from '../../../types';
 import { formatarTelefone } from '../../../utils/formatters';
@@ -11,15 +12,15 @@ import { toast } from 'react-hot-toast';
 
 interface ListaVendedoresProps {
   vendedores: Usuario[];
-  onAddVendedor: () => void;
   onVendedoresChange?: () => void;
 }
 
 export function ListaVendedores({ 
   vendedores, 
-  onAddVendedor,
   onVendedoresChange 
 }: ListaVendedoresProps) {
+  const navigate = useNavigate();
+
   const handleToggleStatus = async (vendedor: Usuario) => {
     try {
       await alterarStatusVendedor(vendedor.id, !vendedor.ativo);
@@ -39,7 +40,7 @@ export function ListaVendedores({
           Vendedores
         </h2>
         <Button
-          onClick={onAddVendedor}
+          onClick={() => navigate('/admin/vendedores/novo')}
           className="hidden sm:flex items-center"
         >
           <UserPlus className="w-4 h-4 mr-2" />
@@ -103,7 +104,7 @@ export function ListaVendedores({
       </Grid>
 
       <Button
-        onClick={onAddVendedor}
+        onClick={() => navigate('/admin/vendedores/novo')}
         className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg sm:hidden flex items-center justify-center"
       >
         <UserPlus className="w-6 h-6" />

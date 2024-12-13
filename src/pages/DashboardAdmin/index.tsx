@@ -1,89 +1,64 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Users, FileText, LogOut, LayoutDashboard } from 'lucide-react';
-import { ListaDocumentos } from './components/ListaDocumentos';
-import { CadastroVendedor } from './components/CadastroVendedor';
-import { ListaVendedores } from './components/ListaVendedores';
-import { Dashboard } from './components/Dashboard';
+import { LayoutDashboard, FileText, Users } from 'lucide-react';
 import { Layout } from '../../components/Layout';
-import { listarDocumentos } from './services/documentoService';
-import { listarVendedores } from './services/vendedorService';
-import { Documento, Usuario } from '../../types';
-import { useAuthStore } from '../../store/authStore';
+import { Dashboard } from './components/Dashboard';
+import { ListaDocumentos } from './components/ListaDocumentos';
+import { ListaVendedores } from './components/ListaVendedores';
+import { CadastroVendedor } from './components/CadastroVendedor';
+import { ConfiguracaoPerfil } from './components/ConfiguracaoPerfil';
+import { useAdminDashboard } from './hooks/useAdminDashboard';
 
 export default function DashboardAdmin() {
-  const [documentos, setDocumentos] = useState<Documento[]>([]);
-  const [vendedores, setVendedores] = useState<Usuario[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showCadastroVendedor, setShowCadastroVendedor] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const usuario = useAuthStore((state) => state.usuario);
-
-  useEffect(() => {
-    if (usuario?.id) {
-      carregarDados();
-    }
-  }, [usuario?.id]);
-
-  async function carregarDados() {
-    try {
-      const [docs, vends] = await Promise.all([
-        listarDocumentos(usuario!.id),
-        listarVendedores(usuario!.id)
-      ]);
-      setDocumentos(docs);
-      setVendedores(vends);
-    } catch (error) {
-      console.error('Erro ao carregar dados:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { documentos, vendedores, loading, recarregarDados } = useAdminDashboard();
 
   const navigation = (
-    <div className="hidden sm:flex sm:space-x-8">
+    <nav className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
       <Link
         to="/admin"
-        className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+        className={
           location.pathname === '/admin'
-            ? 'border-blue-500 text-gray-900'
-            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-        }`}
+            ? 'bg-[#f6f8fa] text-[#24292f] border border-[#d0d7de] inline-flex items-center px-3 py-2 text-sm font-medium rounded-md'
+            : 'text-[#24292f] hover:bg-[#f6f8fa] inline-flex items-center px-3 py-2 text-sm font-medium rounded-md'
+        }
       >
         <LayoutDashboard className="w-4 h-4 mr-2" />
         Dashboard
       </Link>
       <Link
         to="/admin/documentos"
-        className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-          location.pathname === '/admin/documentos'
-            ? 'border-blue-500 text-gray-900'
-            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-        }`}
+        className={
+          location.pathname.includes('/documentos')
+            ? 'bg-[#f6f8fa] text-[#24292f] border border-[#d0d7de] inline-flex items-center px-3 py-2 text-sm font-medium rounded-md'
+            : 'text-[#24292f] hover:bg-[#f6f8fa] inline-flex items-center px-3 py-2 text-sm font-medium rounded-md'
+        }
       >
         <FileText className="w-4 h-4 mr-2" />
         Documentos
       </Link>
       <Link
         to="/admin/vendedores"
-        className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-          location.pathname === '/admin/vendedores'
-            ? 'border-blue-500 text-gray-900'
-            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-        }`}
+        className={
+          location.pathname.includes('/vendedores')
+            ? 'bg-[#f6f8fa] text-[#24292f] border border-[#d0d7de] inline-flex items-center px-3 py-2 text-sm font-medium rounded-md'
+            : 'text-[#24292f] hover:bg-[#f6f8fa] inline-flex items-center px-3 py-2 text-sm font-medium rounded-md'
+        }
       >
         <Users className="w-4 h-4 mr-2" />
         Vendedores
       </Link>
-    </div>
+    </nav>
   );
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
+      <Layout title="Painel do Administrador" navigation={navigation}>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2da44e]"></div>
+        </div>
+      </Layout>
     );
   }
 
@@ -99,9 +74,8 @@ export default function DashboardAdmin() {
           element={
             <ListaDocumentos
               documentos={documentos}
-              onChangeStatus={async (documentoId, novoStatus) => {
-                // Implementar a lógica de mudança de status
-                await carregarDados();
+              onChangeStatus={async () => {
+                await recarregarDados();
               }}
             />
           }
@@ -109,24 +83,27 @@ export default function DashboardAdmin() {
         <Route
           path="/vendedores"
           element={
-            <>
-              {showCadastroVendedor ? (
-                <CadastroVendedor
-                  onSuccess={() => {
-                    setShowCadastroVendedor(false);
-                    carregarDados();
-                  }}
-                  onCancel={() => setShowCadastroVendedor(false)}
-                />
-              ) : (
-                <ListaVendedores
-                  vendedores={vendedores}
-                  onAddVendedor={() => setShowCadastroVendedor(true)}
-                  onVendedoresChange={carregarDados}
-                />
-              )}
-            </>
+            <ListaVendedores
+              vendedores={vendedores}
+              onVendedoresChange={recarregarDados}
+            />
           }
+        />
+        <Route
+          path="/vendedores/novo"
+          element={
+            <CadastroVendedor
+              onSuccess={() => {
+                recarregarDados();
+                navigate('/admin/vendedores');
+              }}
+              onCancel={() => navigate('/admin/vendedores')}
+            />
+          }
+        />
+        <Route
+          path="/configuracao"
+          element={<ConfiguracaoPerfil />}
         />
       </Routes>
     </Layout>

@@ -7,6 +7,8 @@ export interface Usuario {
   tipo: 'admin' | 'vendedor' | 'super_admin';
   ativo: boolean;
   dataCriacao: Date;
+  logo?: string;
+  avatar?: string;
 }
 
 export interface Documento {

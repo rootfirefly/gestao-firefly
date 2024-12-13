@@ -1,109 +1,110 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { FileText } from 'lucide-react';
+import { LayoutDashboard, FileText } from 'lucide-react';
 import { ListaDocumentos } from './components/ListaDocumentos';
 import { FormularioDocumento } from './components/FormularioDocumento';
 import { VisualizarDocumento } from './components/VisualizarDocumento';
 import { Estatisticas } from './components/Estatisticas';
 import { useAuthStore } from '../../store/authStore';
-import { BottomNavigation } from '../../components/BottomNavigation';
 import { FloatingActionButton } from '../../components/FloatingActionButton';
 import { Layout } from '../../components/Layout';
+import { Modal } from '../../components/Modal';
 import { useDocumentos } from './hooks/useDocumentos';
 
 export default function DashboardVendedor() {
   const navigate = useNavigate();
   const location = useLocation();
-  const setUsuario = useAuthStore((state) => state.setUsuario);
-  const usuario = useAuthStore((state) => state.usuario);
   const { documentos, loading, recarregar } = useDocumentos();
-
-  const handleLogout = () => {
-    setUsuario(null);
-    navigate('/login');
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isRootPath = location.pathname === '/vendedor' || location.pathname === '/vendedor/';
   const isDocumentosRoute = location.pathname === '/vendedor/documentos';
 
   const navigation = (
-    <div className="hidden sm:flex sm:space-x-8">
+    <nav className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
       <Link
         to="/vendedor"
-        className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+        className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md ${
           isRootPath
-            ? 'border-blue-500 text-gray-900'
-            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+            ? 'bg-[#f6f8fa] text-[#24292f] border border-[#d0d7de]'
+            : 'text-[#24292f] hover:bg-[#f6f8fa]'
         }`}
       >
+        <LayoutDashboard className="w-4 h-4 mr-2" />
         Dashboard
       </Link>
       <Link
         to="/vendedor/documentos"
-        className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-          location.pathname.includes('/vendedor/documentos')
-            ? 'border-blue-500 text-gray-900'
-            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+        className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md ${
+          location.pathname.includes('/documentos')
+            ? 'bg-[#f6f8fa] text-[#24292f] border border-[#d0d7de]'
+            : 'text-[#24292f] hover:bg-[#f6f8fa]'
         }`}
       >
         <FileText className="w-4 h-4 mr-2" />
-        Meus Documentos
+        Documentos
       </Link>
-    </div>
+    </nav>
   );
+
+  const handleSuccess = () => {
+    setIsModalOpen(false);
+    recarregar();
+  };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2da44e]"></div>
       </div>
     );
   }
 
   return (
-    <Layout title="Painel do Vendedor" navigation={navigation}>
-      <Routes>
-        <Route
-          path="/"
-          element={<Estatisticas documentos={documentos} />}
-        />
-        <Route
-          path="documentos"
-          element={
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-800">
-                  Meus Documentos
-                </h2>
-                <button
-                  onClick={() => navigate('/vendedor/documentos/novo')}
-                  className="hidden sm:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Novo Documento
-                </button>
+    <Layout title="Gestão FireFly" navigation={navigation}>
+      <div className="px-4 sm:px-0">
+        <Routes>
+          <Route
+            path="/"
+            element={<Estatisticas documentos={documentos} />}
+          />
+          <Route
+            path="documentos"
+            element={
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold text-[#24292f]">
+                    Meus Documentos
+                  </h2>
+                  <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-[#2da44e] hover:bg-[#2c974b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2da44e]"
+                  >
+                    Novo Documento
+                  </button>
+                </div>
+                <ListaDocumentos />
               </div>
-              <ListaDocumentos />
-            </div>
-          }
-        />
-        <Route
-          path="documentos/novo"
-          element={<FormularioDocumento onSuccess={recarregar} />}
-        />
-        <Route
-          path="documentos/:id"
-          element={<FormularioDocumento onSuccess={recarregar} />}
-        />
-        <Route
-          path="documentos/:id/visualizar"
-          element={<VisualizarDocumento />}
-        />
-      </Routes>
+            }
+          />
+          <Route
+            path="documentos/:id/visualizar"
+            element={<VisualizarDocumento />}
+          />
+        </Routes>
 
-      {isRootPath || isDocumentosRoute ? (
-        <FloatingActionButton onClick={() => navigate('/vendedor/documentos/novo')} />
-      ) : null}
-      <BottomNavigation onLogout={handleLogout} />
+        {(isRootPath || isDocumentosRoute) && (
+          <FloatingActionButton onClick={() => setIsModalOpen(true)} />
+        )}
+
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Novo Documento"
+        >
+          <FormularioDocumento onSuccess={handleSuccess} />
+        </Modal>
+      </div>
     </Layout>
   );
 }
