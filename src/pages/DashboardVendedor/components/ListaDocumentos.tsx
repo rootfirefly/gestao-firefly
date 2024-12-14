@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Edit, FileText } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { Documento } from '../../../types';
-import { listarDocumentosVendedor } from '../services/documentoService';
-import { useAuthStore } from '../../../store/authStore';
+
+interface ListaDocumentosProps {
+  documentos: Documento[];
+  onUpdate: () => Promise<void>;
+}
 
 const statusMap = {
   em_andamento: { label: 'Em Andamento', color: 'yellow' },
@@ -14,40 +17,12 @@ const statusMap = {
   finalizado: { label: 'Finalizado', color: 'green' }
 };
 
-export function ListaDocumentos() {
-  const [documentos, setDocumentos] = useState<Documento[]>([]);
-  const [loading, setLoading] = useState(true);
+export function ListaDocumentos({ documentos, onUpdate }: ListaDocumentosProps) {
   const navigate = useNavigate();
-  const usuario = useAuthStore((state) => state.usuario);
-
-  useEffect(() => {
-    if (usuario?.id) {
-      carregarDocumentos();
-    }
-  }, [usuario?.id]);
-
-  async function carregarDocumentos() {
-    try {
-      const docs = await listarDocumentosVendedor(usuario!.id);
-      setDocumentos(docs);
-    } catch (error) {
-      console.error('Erro ao carregar documentos:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const podeEditar = (status: Documento['status']) => {
     return status === 'em_andamento';
   };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

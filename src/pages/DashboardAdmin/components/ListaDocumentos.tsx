@@ -1,8 +1,11 @@
+// src/pages/DashboardAdmin/components/ListaDocumentos.tsx
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { FileText, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { Documento } from '../../../types';
+import { atualizarStatusDocumento } from '../services/documentoService';
 
 interface ListaDocumentosProps {
   documentos: (Documento & { nomeVendedor: string })[];
@@ -20,6 +23,17 @@ export function ListaDocumentos({ documentos, onChangeStatus }: ListaDocumentosP
 
   const toggleDocumento = (documentoId: string) => {
     setDocumentoExpandido(documentoExpandido === documentoId ? null : documentoId);
+  };
+
+  const handleStatusChange = async (documentoId: string, novoStatus: Documento['status']) => {
+    try {
+      await atualizarStatusDocumento(documentoId, novoStatus);
+      if (onChangeStatus) {
+        onChangeStatus(documentoId, novoStatus);
+      }
+    } catch (error) {
+      toast.error('Erro ao atualizar status do documento');
+    }
   };
 
   return (
@@ -53,7 +67,7 @@ export function ListaDocumentos({ documentos, onChangeStatus }: ListaDocumentosP
             <select
               className="w-full p-2 border rounded-md"
               value={documento.status}
-              onChange={(e) => onChangeStatus(documento.id, e.target.value as Documento['status'])}
+              onChange={(e) => handleStatusChange(documento.id, e.target.value as Documento['status'])}
             >
               <option value="em_andamento">Em Andamento</option>
               <option value="aguardando">Aguardando</option>
@@ -92,7 +106,9 @@ export function ListaDocumentos({ documentos, onChangeStatus }: ListaDocumentosP
 
                 <div className="space-y-3">
                   <div className="bg-white p-3 rounded border border-gray-200">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Comprovante de Pagamento</p>
+                    <p className="text-sm font-medium text-gray-700 mb-2">
+                      Comprovante de Pagamento
+                    </p>
                     <a
                       href={documento.comprovantePagamento}
                       target="_blank"
@@ -106,7 +122,9 @@ export function ListaDocumentos({ documentos, onChangeStatus }: ListaDocumentosP
 
                   {documento.arquivos.length > 0 && (
                     <div className="bg-white p-3 rounded border border-gray-200">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Documentos Adicionais</p>
+                      <p className="text-sm font-medium text-gray-700 mb-2">
+                        Documentos Adicionais
+                      </p>
                       <ul className="space-y-2">
                         {documento.arquivos.map((url, index) => (
                           <li key={index}>

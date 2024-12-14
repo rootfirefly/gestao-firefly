@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '../../../store/authStore';
 import { listarDocumentosVendedor } from '../services/documentoService';
 import { Documento } from '../../../types';
@@ -8,22 +8,27 @@ export function useDocumentos() {
   const [loading, setLoading] = useState(true);
   const usuario = useAuthStore((state) => state.usuario);
 
-  useEffect(() => {
-    if (usuario?.id) {
-      carregarDocumentos();
-    }
-  }, [usuario?.id]);
-
-  async function carregarDocumentos() {
+  const carregarDocumentos = useCallback(async () => {
+    if (!usuario?.id) return;
+    
     try {
-      const docs = await listarDocumentosVendedor(usuario!.id);
+      setLoading(true);
+      const docs = await listarDocumentosVendedor(usuario.id);
       setDocumentos(docs);
     } catch (error) {
       console.error('Erro ao carregar documentos:', error);
     } finally {
       setLoading(false);
     }
-  }
+  }, [usuario?.id]);
 
-  return { documentos, loading, recarregar: carregarDocumentos };
+  useEffect(() => {
+    carregarDocumentos();
+  }, [carregarDocumentos]);
+
+  return {
+    documentos,
+    loading,
+    recarregar: carregarDocumentos
+  };
 }

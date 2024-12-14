@@ -26,6 +26,18 @@ export function FormularioDocumento({ onSuccess }: FormularioDocumentoProps) {
   const [arquivosSelecionados, setArquivosSelecionados] = useState<File[]>([]);
   const [comprovanteSelecionado, setComprovanteSelecionado] = useState<File | null>(null);
 
+  const resetForm = () => {
+    setFormData({
+      nome: '',
+      cpfCnpj: '',
+      observacoes: '',
+      arquivos: [],
+      comprovantePagamento: ''
+    });
+    setArquivosSelecionados([]);
+    setComprovanteSelecionado(null);
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
       ...prev,
@@ -84,6 +96,8 @@ export function FormularioDocumento({ onSuccess }: FormularioDocumentoProps) {
       });
 
       toast.success('Documento cadastrado com sucesso!');
+      resetForm();
+      
       if (onSuccess) {
         onSuccess();
       }

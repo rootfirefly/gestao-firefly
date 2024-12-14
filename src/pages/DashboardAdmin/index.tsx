@@ -13,7 +13,9 @@ export default function DashboardAdmin() {
   const location = useLocation();
   const navigate = useNavigate();
   const { documentos, vendedores, loading, recarregarDados } = useAdminDashboard();
+   
 
+  
   const navigation = (
     <nav className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
       <Link
