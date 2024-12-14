@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Registro from './pages/Registro';
+import Documentacao from './pages/Documentacao';
 import DashboardVendedor from './pages/DashboardVendedor';
 import DashboardAdmin from './pages/DashboardAdmin';
 import DashboardSuperAdmin from './pages/DashboardSuperAdmin';
@@ -26,6 +27,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
+        <Route path="/documentacao" element={<Documentacao />} />
         <Route
           path="/vendedor/*"
           element={
