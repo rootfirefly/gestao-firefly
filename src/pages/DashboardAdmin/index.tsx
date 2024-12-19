@@ -7,15 +7,14 @@ import { ListaDocumentos } from './components/ListaDocumentos';
 import { ListaVendedores } from './components/ListaVendedores';
 import { CadastroVendedor } from './components/CadastroVendedor';
 import { ConfiguracaoPerfil } from './components/ConfiguracaoPerfil';
+import { Relatorios } from './components/Relatorios';
 import { useAdminDashboard } from './hooks/useAdminDashboard';
 
 export default function DashboardAdmin() {
   const location = useLocation();
   const navigate = useNavigate();
   const { documentos, vendedores, loading, recarregarDados } = useAdminDashboard();
-   
 
-  
   const navigation = (
     <nav className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
       <Link
@@ -51,6 +50,17 @@ export default function DashboardAdmin() {
         <Users className="w-4 h-4 mr-2" />
         Vendedores
       </Link>
+      <Link
+        to="/admin/relatorios"
+        className={
+          location.pathname.includes('/relatorios')
+            ? 'bg-[#f6f8fa] text-[#24292f] border border-[#d0d7de] inline-flex items-center px-3 py-2 text-sm font-medium rounded-md'
+            : 'text-[#24292f] hover:bg-[#f6f8fa] inline-flex items-center px-3 py-2 text-sm font-medium rounded-md'
+        }
+      >
+        <FileText className="w-4 h-4 mr-2" />
+        Relatórios
+      </Link>
     </nav>
   );
 
@@ -67,46 +77,12 @@ export default function DashboardAdmin() {
   return (
     <Layout title="Painel do Administrador" navigation={navigation}>
       <Routes>
-        <Route
-          path="/"
-          element={<Dashboard documentos={documentos} vendedores={vendedores} />}
-        />
-        <Route
-          path="/documentos"
-          element={
-            <ListaDocumentos
-              documentos={documentos}
-              onChangeStatus={async () => {
-                await recarregarDados();
-              }}
-            />
-          }
-        />
-        <Route
-          path="/vendedores"
-          element={
-            <ListaVendedores
-              vendedores={vendedores}
-              onVendedoresChange={recarregarDados}
-            />
-          }
-        />
-        <Route
-          path="/vendedores/novo"
-          element={
-            <CadastroVendedor
-              onSuccess={() => {
-                recarregarDados();
-                navigate('/admin/vendedores');
-              }}
-              onCancel={() => navigate('/admin/vendedores')}
-            />
-          }
-        />
-        <Route
-          path="/configuracao"
-          element={<ConfiguracaoPerfil />}
-        />
+        <Route path="/" element={<Dashboard documentos={documentos} vendedores={vendedores} />} />
+        <Route path="/documentos" element={<ListaDocumentos documentos={documentos} onChangeStatus={recarregarDados} />} />
+        <Route path="/vendedores" element={<ListaVendedores vendedores={vendedores} onVendedoresChange={recarregarDados} />} />
+        <Route path="/vendedores/novo" element={<CadastroVendedor onSuccess={recarregarDados} onCancel={() => navigate('/admin/vendedores')} />} />
+        <Route path="/configuracao" element={<ConfiguracaoPerfil />} />
+        <Route path="/relatorios" element={<Relatorios />} />
       </Routes>
     </Layout>
   );

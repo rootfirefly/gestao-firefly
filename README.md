@@ -34,6 +34,16 @@ Sistema web para gestão de documentos com diferentes níveis de acesso (Super A
 - Suporte para logo e avatar
 - Preparação para integração com Asaas
 
+## 📊 Tela de Relatórios
+
+A tela de relatórios foi atualizada para incluir as seguintes funcionalidades:
+
+1. **Filtros de Data**: Agora é possível filtrar os documentos por data de início e data de fim. Os campos de data são exibidos lado a lado em visualizações desktop e empilhados em visualizações mobile.
+
+2. **Exportação em CSV**: Um botão foi adicionado para exportar os documentos filtrados em formato CSV. Se não houver documentos para exportar, uma mensagem de alerta será exibida informando "Sem documentos para exportar".
+
+3. **Melhorias na Visualização**: A lista de documentos agora exibe o nome do documento, CPF/CNPJ abaixo do nome com uma fonte menor, e o status é representado apenas por ícones, sem título.
+
 ## 🛠️ Tecnologias
 
 - React + TypeScript
